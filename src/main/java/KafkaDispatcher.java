@@ -2,16 +2,14 @@ import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.protocol.types.Field;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.UUID;
 
-public class KafkaDispatcher implements Closeable {
-    private final KafkaProducer<String, String> producer;
+public class KafkaDispatcher<T> implements Closeable {
+    private final KafkaProducer<String, T> producer;
 
     KafkaDispatcher() {
         this.producer = new KafkaProducer<>(properties());
@@ -24,8 +22,8 @@ public class KafkaDispatcher implements Closeable {
         return properties;
     }
 
-    public void send(String topic, String key, String value) {
-        var record = new ProducerRecord<String, String>(topic, key, value);
+    public void send(String topic, String key, T value) {
+        var record = new ProducerRecord<String, T>(topic, key, value);
         Callback callback = (data, ex) -> {
             if (ex != null) {
                 ex.printStackTrace();
